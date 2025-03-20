@@ -25,6 +25,12 @@ class State0 extends States
             return newState;
         }
         
+        if(currentChar == ' ' || currentChar == '\n' || currentChar == '\r')
+        {
+            newState = new State0();
+        }
+
+        
         return newState;    
     }   
 }
@@ -56,7 +62,7 @@ class DigitState extends States
             return newState;
         }
 
-        return newState;
+        return newState = new CT_INTState();
     }
     
 }
@@ -105,9 +111,28 @@ class DigitRealState extends States
             return newState;
         }
         else
-
-        
+        {
+            newState = new CT_REALState();
+            return newState;
+        }   
     }
+    
+}
+
+class CT_REALState extends States
+{
+    public CT_REALState()
+    {
+        this.finalState = true;
+    }
+
+    @Override
+    States HandleState(char currentChar) 
+    {
+        newState = new State0();
+        return newState;
+    }
+
     
 }
 
@@ -120,7 +145,7 @@ public class LexAn
     int lineLen;
 
     char currentChar;
-    char prevChar;
+    //char prevChar;
 
     String TokenValue = "";
 
@@ -136,6 +161,8 @@ public class LexAn
         {
             readLine = scanner.nextLine();
 
+            readLine += '\n';
+
             lineCount++;
 
             lineLen = readLine.length();
@@ -143,6 +170,8 @@ public class LexAn
             for(int i = 0; i < lineLen; i++)
             {
                 currentChar = readLine.charAt(i);
+
+                if(TheState instanceof State0) TokenValue = "";
 
                 TheState = TheState.HandleState(currentChar);
 
@@ -165,13 +194,15 @@ public class LexAn
                     TokenValue += currentChar;
                 }
             }
-        }    
+        }
+        
+        scanner.close();
             
         } catch (FileNotFoundException e) 
         {
             System.err.println("FILE NOT FOUND");
             e.printStackTrace();
-        }       
+        }
 
         return tokenList;
     }
