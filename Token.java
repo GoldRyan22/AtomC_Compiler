@@ -43,8 +43,13 @@ public class Token
          this.value = value;
       }
 
-      
-      
-
    }
+
+    @Override
+    public String toString() 
+    {
+        return this.code + " " + this.value.toString() +  " " + this.line;
+    }
+
+   
 }
