@@ -5,6 +5,10 @@ import java.lang.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import javax.swing.plaf.nimbus.State;
+
+
+//------------------------------ BASIC STATES ----------------------------------
 
 abstract class States
 {
@@ -12,6 +16,29 @@ abstract class States
     boolean finalState = false;
 
     abstract States HandleState(char currentChar);
+}
+
+class FinalState extends States
+{
+    public FinalState()
+    {
+        this.finalState = true;
+    }
+
+    @Override
+    States HandleState(char currentChar) 
+    {
+        newState = new State0();
+        return newState;
+    }
+}
+
+class ErrorState extends States
+{
+    @Override
+    public States HandleState(char currentChar) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }  
 }
 
 class State0 extends States
@@ -24,10 +51,10 @@ class State0 extends States
             newState = new DigitState();
             return newState;
         }
-        
-        if(currentChar == ' ' || currentChar == '\n' || currentChar == '\r')
+        else if(currentChar == ' ' || currentChar == '\n' || currentChar == '\r')
         {
             newState = new State0();
+            return newState;
         }
 
         
@@ -35,13 +62,9 @@ class State0 extends States
     }   
 }
 
-class ErrorState extends States
-{
-    @Override
-    public States HandleState(char currentChar) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }  
-}
+//------------------------------ BASIC STATES-END ----------------------------------
+
+//------------------------------ CONSTANTS -----------------------------------------
 
 class DigitState extends States
 {
@@ -132,9 +155,171 @@ class CT_REALState extends States
         newState = new State0();
         return newState;
     }
-
-    
 }
+
+//------------------------------------------ CONSTANTS-END --------------------------
+
+//------------------------------------------ OPERATORS ------------------------------
+
+class ADDState extends FinalState{}
+
+class SUBState extends FinalState{}
+
+class MULState extends FinalState{}
+
+class DIVState extends FinalState{}
+
+class DOTState extends FinalState{}
+
+class PartialAndState extends States
+{
+    @Override
+    States HandleState(char currentChar) 
+    {
+        if(currentChar == '&')
+        {
+            newState = new ANDState();
+            return newState;
+        }
+        return newState;
+    }
+}
+
+class ANDState extends FinalState{}
+
+class PartialOrState extends States
+{
+    @Override
+    States HandleState(char currentChar) 
+    {
+        if(currentChar == '|')
+        {
+            newState = new ORState();
+            return newState;
+        }
+        return newState;
+    }
+}
+
+class ORState extends FinalState{}
+
+class NOTState extends FinalState{}
+
+class AssignOREqualState extends States
+{
+    @Override
+    States HandleState(char currentChar) 
+    {
+        if(currentChar == '=')
+        {
+            newState = new EQUALState();
+            return newState;
+        }
+        else
+        {
+            newState = new ASSIGNState();
+            return newState;
+        }
+
+        //return newState;
+    }
+}
+
+class ASSIGNState extends FinalState{}
+
+class EQUALState extends FinalState{}
+
+class NotORNotEqualState extends States
+{
+    @Override
+    States HandleState(char currentChar) 
+    {
+        if(currentChar == '=')
+        {
+            newState = new NOTEQState();
+            
+
+        }
+        else
+        {
+            newState = new NOTState();
+        }
+
+        return newState;
+        
+    }
+}
+
+class NOTEQState extends FinalState{}
+
+class LESSState extends FinalState{}
+
+class LESSEQ extends FinalState{}
+
+class LessORLessEqState extends States
+{
+    @Override
+    States HandleState(char currentChar) 
+    {
+        if(currentChar == '=')
+        {
+            newState = new LESSEQ();
+            return newState;
+        }
+        else
+        {
+            newState = new LESSState();
+            return newState;
+        }
+        
+    }
+}
+
+class GREATERState extends FinalState{}
+
+class GREATEREQState extends FinalState{}
+
+class GreaterORGreaterEqState extends States
+{
+    @Override
+    States HandleState(char currentChar) 
+    {
+        if(currentChar == '=')
+        {
+            newState = new GREATEREQState();
+            return newState;
+        }
+        else
+        {
+            newState = new GREATERState();
+            return newState;
+        }
+        
+    }
+}
+
+//------------------------------------------ OPERATORS-END ----------------------------
+
+//------------------------------------------ DELIMITERS -------------------------------
+
+class COMMAState extends FinalState{}
+
+class SEMICOLONState extends FinalState{}
+
+class LPARState extends FinalState{}
+
+class RPARState extends FinalState{}
+
+class LBRACKETState extends FinalState{}
+
+class RBRACKETState extends FinalState{}
+
+class LACCState extends FinalState{}
+
+class RACCState extends FinalState{}
+
+//------------------------------------------ DELIMITERS-END ---------------------------
+
 
 public class LexAn 
 {
