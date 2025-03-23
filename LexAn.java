@@ -98,6 +98,38 @@ class State0 extends States
         {
             newState = new GreaterORGreaterEqState();
         }
+        else if(currentChar == ',')
+        {
+            newState = new COMMAState();
+        }
+        else if(currentChar == ';')
+        {
+            newState = new SEMICOLONState();
+        }
+        else if(currentChar == '(')
+        {
+            newState = new LPARState();
+        }
+        else if(currentChar == ')')
+        {
+            newState = new LPARState();
+        }
+        else if(currentChar == '[')
+        {
+            newState = new LBRACKETState();
+        }
+        else if(currentChar == ']')
+        {
+            newState = new RBRACKETState();
+        }
+        else if(currentChar == '{')
+        {
+            newState = new LACCState();
+        }
+        else if(currentChar == '}')
+        {
+            newState = new RACCState();
+        }
 
 
         
