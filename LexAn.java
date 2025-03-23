@@ -48,14 +48,57 @@ class State0 extends States
     {
         if(Character.isDigit(currentChar))
         {
-            newState = new DigitState();
-            return newState;
+            newState = new DigitState();    
         }
         else if(currentChar == ' ' || currentChar == '\n' || currentChar == '\r')
         {
             newState = new State0();
-            return newState;
         }
+        else if(currentChar == '+')
+        {
+            newState = new ADDState();  
+        }
+        else if(currentChar == '-')
+        {
+            newState = new SUBState();
+        }
+        else if(currentChar == '*')
+        {
+            newState = new MULState();
+        }
+        else if(currentChar =='/' )
+        {
+            newState = new DIVState();
+        }
+        else if(currentChar == '.')
+        {
+            newState = new DOTState();
+        }
+        else if(currentChar == '&')
+        {
+            newState = new PartialAndState();
+        }
+        else if(currentChar == '|')
+        {
+            newState = new PartialOrState();
+        }
+        else if(currentChar == '!')
+        {
+            newState = new NotORNotEqualState();
+        }
+        else if(currentChar == '=')
+        {
+            newState = new AssignOREqualState();
+        }
+        else if(currentChar == '<')
+        {
+            newState = new LessORLessEqState();
+        }
+        else if(currentChar == '>')
+        {
+            newState = new GreaterORGreaterEqState();
+        }
+
 
         
         return newState;    
