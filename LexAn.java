@@ -5,8 +5,6 @@ import java.lang.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import javax.swing.plaf.nimbus.State;
-
 
 //------------------------------ BASIC STATES ----------------------------------
 
@@ -50,9 +48,10 @@ class State0 extends States
         {
             newState = new DigitState();    
         }
-        else if(currentChar == ' ' || currentChar == '\n' || currentChar == '\r')
+        else if(currentChar == ' ' || currentChar == '\n' || currentChar == '\r' || Character.isWhitespace(currentChar))
         {
             newState = new State0();
+            return newState;
         }
         else if(currentChar == '+')
         {
@@ -112,7 +111,7 @@ class State0 extends States
         }
         else if(currentChar == ')')
         {
-            newState = new LPARState();
+            newState = new RPARState();
         }
         else if(currentChar == '[')
         {
@@ -130,6 +129,10 @@ class State0 extends States
         {
             newState = new RACCState();
         }
+        else if(Character.isLetter(currentChar))
+        {
+            newState = new IDKEY_BurnState();
+        }
 
 
         
@@ -138,6 +141,33 @@ class State0 extends States
 }
 
 //------------------------------ BASIC STATES-END ----------------------------------
+
+//------------------------------ IDENTIFIERS AND KEYWORDS --------------------------
+
+class IDKEY_BurnState extends States
+{
+
+    @Override
+    States HandleState(char currentChar) 
+    {
+        if(Character.isLetter(currentChar) || Character.isDigit(currentChar) || currentChar == '_')
+        {
+            newState = new IDKEY_BurnState();
+            return newState;
+        }
+        else
+        {
+            newState = new IDKEYSTATE();
+        }
+
+        return newState;
+    }
+    
+}
+
+class IDKEYSTATE extends FinalState{};
+
+//------------------------------ IDENTIFIERS AND KEYWORDS-END ----------------------
 
 //------------------------------ CONSTANTS -----------------------------------------
 
@@ -231,6 +261,7 @@ class CT_REALState extends States
         return newState;
     }
 }
+
 
 //------------------------------------------ CONSTANTS-END --------------------------
 
@@ -437,6 +468,11 @@ public class LexAn
 
                 if(TheState.finalState)
                 {
+                    if(TokenValue.isEmpty())
+                    {
+                        TokenValue +=currentChar;
+                        i++;
+                    }
                     // making the codename for the final class ex CT_INTSTATE -> CT_INT   
                     String codeName = TheState.getClass().getName();
                     int nameLen = codeName.length();

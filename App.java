@@ -21,7 +21,7 @@ public class App
 
          
 
-        ArrayList<Token> tokenList = lexAn.LexicalAnalysis("tests/mytest.c");
+        ArrayList<Token> tokenList = lexAn.LexicalAnalysis("tests/0.c");
 
         for (Token token : tokenList) 
         {
