@@ -44,7 +44,15 @@ class State0 extends States
     @Override
     public States HandleState(char currentChar) 
     {
-        if(Character.isDigit(currentChar))
+        if(currentChar == '\'')
+        {
+            newState = new CharSlashORCharState();
+        }
+        else if(currentChar == '0')
+        {
+            newState = new OctalOrHexState();
+        }
+        else if(Character.isDigit(currentChar))
         {
             newState = new DigitState();    
         }
@@ -67,7 +75,7 @@ class State0 extends States
         }
         else if(currentChar =='/' )
         {
-            newState = new DIVState();
+            newState = new SlashState();
         }
         else if(currentChar == '.')
         {
@@ -195,6 +203,65 @@ class DigitState extends States
     
 }
 
+class OctalOrHexState extends States
+{
+
+    @Override
+    States HandleState(char currentChar) 
+    {
+        if(currentChar == 'x')
+        {
+            newState = new HexDigitState();
+            
+        }
+        else if(Character.isDigit(currentChar) && currentChar!='8' && currentChar!='9')
+        {
+            newState = new OctalDigitState();
+        }
+
+        return newState;
+        
+    }
+    
+}
+
+class OctalDigitState extends States
+{
+
+    @Override
+    States HandleState(char currentChar) 
+    {
+        if(Character.isDigit(currentChar) && currentChar!='8' && currentChar!='9')
+        {
+            newState = new OctalDigitState();
+        }
+        else
+        {
+            newState = new CT_INTState();
+        }
+
+        return newState;
+    }   
+}
+
+class HexDigitState extends States
+{
+    @Override
+    States HandleState(char currentChar) 
+    {
+        if(Character.isDigit(currentChar) || (currentChar>='a' && currentChar<='f') || (currentChar>='A' && currentChar<='F'))
+        {
+            newState = new HexDigitState();
+        }
+        else
+        {
+            newState = new CT_INTState();
+        }
+
+        return newState;
+    }
+}
+
 class CT_INTState extends States
 {
     public CT_INTState() 
@@ -261,6 +328,81 @@ class CT_REALState extends States
         return newState;
     }
 }
+
+class CharSlashORCharState extends States
+{
+
+    @Override
+    States HandleState(char currentChar) 
+    {
+        if(currentChar == '\\')
+        {
+            newState = new SpecialCharState();
+        }
+        else
+        {
+            newState = new CloseChar();
+        }
+
+        return newState;
+    }  
+}
+
+class SpecialCharState extends States
+{
+
+    @Override
+    States HandleState(char currentChar) 
+    {
+        if(currentChar == 'a' || currentChar == 'b' || currentChar == 'f' || currentChar == 'n' ||
+           currentChar == 'r' || currentChar == 't' || currentChar == 'v' || currentChar == '0')
+        {
+            newState = new CloseChar();
+        }
+
+        return newState;
+    }
+    
+}
+
+class CloseChar extends States
+{
+
+    @Override
+    States HandleState(char currentChar) 
+    {
+        if(currentChar == '\'')
+        {
+            newState = new CT_CHARState();
+        }
+
+        return newState;
+    }
+    
+}
+
+class CT_CHARState extends FinalState{}
+
+class StringBurner extends States
+{
+
+    @Override
+    States HandleState(char currentChar) 
+    {
+       if(currentChar !='\"' )
+       {
+            newState = new StringBurner();
+       }
+       else
+       {
+            newState = new CT_STRINGState();
+       }
+
+       return newState;
+    }
+}
+
+class CT_STRINGState extends FinalState{};
 
 
 //------------------------------------------ CONSTANTS-END --------------------------
@@ -424,6 +566,93 @@ class LACCState extends FinalState{}
 
 class RACCState extends FinalState{}
 
+class SlashState extends States
+{
+
+    @Override
+    States HandleState(char currentChar) 
+    {
+        if(currentChar == '/')
+        {
+            newState = new LineComBurnState();
+        }
+        else if(currentChar == '*')
+        {
+            newState = new CommBurnState();
+        }
+        else
+        {
+            newState = new DIVState();
+        }
+
+        return newState;
+    }
+    
+} 
+
+class LineComBurnState extends States
+{
+
+    @Override
+    States HandleState(char currentChar) 
+    {
+        if(currentChar !='\n' && currentChar !='\r' && currentChar !='\0')
+        {
+            newState = new LineComBurnState();
+        }
+        else
+        {
+            newState = new LINECOMMENTState();
+        }
+
+        return newState;
+    }
+    
+}
+
+class LINECOMMENTState extends FinalState{}
+
+class CommBurnState extends States
+{
+
+    @Override
+    States HandleState(char currentChar) 
+    {
+        if(currentChar == '*')
+        {
+            newState = new CommStarState();
+        }
+        else
+        {
+            newState = new CommBurnState();
+        }
+
+        return newState;   
+    }
+    
+}
+
+class CommStarState extends States
+{
+
+    @Override
+    States HandleState(char currentChar) 
+    {
+       if(currentChar == '/')
+       {
+            newState = new COMMENTState();
+       }
+       else
+       {
+            newState = new CommBurnState();
+       }
+
+       return newState;
+    }
+}
+
+class COMMENTState extends FinalState{}
+
 //------------------------------------------ DELIMITERS-END ---------------------------
 
 
@@ -473,13 +702,19 @@ public class LexAn
                         TokenValue +=currentChar;
                         i++;
                     }
+
+                    
+
                     // making the codename for the final class ex CT_INTSTATE -> CT_INT   
                     String codeName = TheState.getClass().getName();
                     int nameLen = codeName.length();
                     codeName = codeName.subSequence(0, nameLen-5).toString();
 
-                    Token newToken = new Token(lineCount, TokenValue, codeName);
-                    tokenList.add(newToken);
+                    if(!codeName.equals("COMMENT") && !codeName.equals("LINECOMMENT"))
+                    {
+                        Token newToken = new Token(lineCount, TokenValue, codeName);
+                        tokenList.add(newToken);
+                    }
 
                     TheState = TheState.HandleState(currentChar);
                     TokenValue = "";
