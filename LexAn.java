@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 
@@ -218,6 +219,7 @@ class OctalOrHexState extends States
         {
             newState = new OctalDigitState();
         }
+        else newState = new CT_INTState();
 
         return newState;
         
@@ -658,7 +660,7 @@ class COMMENTState extends FinalState{}
 
 public class LexAn 
 {
-    ArrayList<Token> tokenList = new ArrayList<>();
+    List<Token> tokenList = new ArrayList<>();
 
     String readLine;
     int lineCount = 0;
@@ -671,7 +673,7 @@ public class LexAn
 
     States TheState = new State0();
 
-    ArrayList<Token> LexicalAnalysis(String fileName)
+    List<Token> LexicalAnalysis(String fileName)
     {
         try 
         {
@@ -725,6 +727,7 @@ public class LexAn
                     TokenValue += currentChar;
                 }
             }
+
         }
         
         scanner.close();
@@ -734,6 +737,8 @@ public class LexAn
             System.err.println("FILE NOT FOUND");
             e.printStackTrace();
         }
+
+        this.tokenList.add(new Token(lineCount, fileName, "END"));
 
         return tokenList;
     }

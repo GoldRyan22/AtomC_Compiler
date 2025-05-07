@@ -1,4 +1,5 @@
-
+import java.util.ArrayList;
+import java.util.List;
 
 enum code 
 {
@@ -13,9 +14,31 @@ enum code
 
 }
 
+class KW_List
+{
+   List<String> kwList= new ArrayList<>();
+
+   public KW_List() 
+   {
+      kwList.add("break");
+      kwList.add("char");
+      kwList.add("double");
+      kwList.add("else");
+      kwList.add("for");
+      kwList.add("if");
+      kwList.add("int");
+      kwList.add("return");
+      kwList.add("struct");
+      kwList.add("void");
+      kwList.add("while");
+   }
+}
+
 public class Token 
 {
    //code code;
+
+   KW_List kwList = new KW_List();
 
    String code;
 
@@ -40,6 +63,17 @@ public class Token
       }
       else
       {
+         if(codeName.equals("IDKEY"))
+         {
+            if(kwList.kwList.contains(value))
+            {
+               this.code = value.toUpperCase();
+            }
+            else
+            {
+               this.code = "ID";
+            }
+         }
          this.value = value;
       }
 
